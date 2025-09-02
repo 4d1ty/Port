@@ -1,0 +1,23 @@
+{% if page.has_other_pages %}
+<tr>
+  <td colspan="4" class="has-text-centered py-2 px-3">
+    <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
+
+      {% if page.has_previous %}
+      <a class="pagination-previous" href="{% querystring page=page.previous_page_number %}">← Previous</a>
+      {% else %}
+      <a class="pagination-previous" disabled>← Previous</a>
+      {% endif %}
+
+      {% if page.has_next %}
+      <a class="pagination-next" href="{% querystring page=page.next_page_number %}">Next →</a>
+      {% else %}
+      <a class="pagination-next" disabled>Next →</a>
+      {% endif %}
+      <br>
+          <span class="pagination-link">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+    </nav>
+  </td>
+</tr>
+
+{% endif %}

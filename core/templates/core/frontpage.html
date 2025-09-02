@@ -15,8 +15,10 @@
             {% if not story.reply_to %}
             {% include 'story/islands/story.html' %}
             {% endif %}
+            {% empty %}
+            <p>No stories found.</p>
         {% endfor %}
-            
+        {% include 'core/islands/pagination.html' with page=stories %}
     </div>
 {% endblock content %}
     

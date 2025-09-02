@@ -1,0 +1,6 @@
+asgiref==3.9.1
+Django==5.2.5
+django-maintenance-mode==0.22.0
+python-fsutil==0.15.0
+sqlparse==0.5.3
+tzdata==2025.2

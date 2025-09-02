@@ -6,10 +6,22 @@ from django.db.models import Q
 from .forms import StoryForm, StoryLinkForm, ReplyStoryForm
 from notifications.models import Notification
 from .models import Story
+from .utils import (
+    rate_limit_story_submission,
+    rate_limit_story_replies,
+    rate_limit_story_replies_time_left,
+    rate_limit_story_submission_time_left,
+)
 
 
 @login_required
 def submit_story(request):
+    if rate_limit_story_submission(request.user):
+        messages.error(
+            request, f"You are submitting stories too quickly. Please wait {rate_limit_story_submission_time_left(request.user)} seconds."
+        )
+        return redirect("core:home")
+
     if request.method == "POST":
         form = StoryForm(request.POST)
         if form.is_valid():
@@ -56,6 +68,12 @@ def delete_story(request, pk):
 
 @login_required
 def reply_story(request, pk):
+    if rate_limit_story_replies(request.user):
+        messages.error(
+            request, f"You are replying to stories too quickly. Please wait {rate_limit_story_replies_time_left(request.user)} seconds."
+        )
+        return redirect("core:home")
+
     story = get_object_or_404(Story, pk=pk)
     if request.method == "POST":
         form = ReplyStoryForm(request.POST)
@@ -86,10 +104,13 @@ def vote_story(request, pk):
 
 def search_story(request):
     if query := request.GET.get("q", None):
-        stories = Story.objects.filter(Q(title__icontains=query)|
-                                       Q(url__icontains=query)|
-                                       Q(content__icontains=query)|
-                                       Q(created_by__username__icontains=query)
-                                       )
-        return render(request, "story/search_story.html", {"query": query, "stories": stories})
+        stories = Story.objects.filter(
+            Q(title__icontains=query)
+            | Q(url__icontains=query)
+            | Q(content__icontains=query)
+            | Q(created_by__username__icontains=query)
+        )
+        return render(
+            request, "story/search_story.html", {"query": query, "stories": stories}
+        )
     return redirect("core:home")
